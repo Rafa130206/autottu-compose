@@ -1,0 +1,43 @@
+services:
+  # 1) Oracle XE (21c)
+  oracle-xe:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: oracle-xe
+    environment:
+      ORACLE_PASSWORD: Oracle123
+    ports:
+      - "1521:1521"
+      - "5501:5501"
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+      - ./oracle-init:/container-entrypoint-initdb.d
+    networks: [cp2-net]
+
+  # 2) Adminer – interface web opcional
+  adminer:
+    image: dockette/adminer:full
+    container_name: adminer
+    ports:
+      - "8080:80"
+    networks: [cp2-net]
+
+  # 3) Sua aplicação CRUD
+  crud-app:
+    build: .
+    container_name: crud-app
+    depends_on: [oracle-xe]
+    environment:
+      DB_HOST: oracle-xe
+      DB_PORT: 1521
+      DB_SID: XE
+      DB_USER: system
+      DB_PASS: oracle
+    ports:
+      - "8081:8080"
+    networks: [cp2-net]
+
+volumes:
+  oracle_data:
+
+networks:
+  cp2-net:
