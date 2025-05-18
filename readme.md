@@ -87,7 +87,7 @@ autottu
 │ │ │ └─ shared # exceções, utilidades
 │ │ └─ resources
 │ │ ├─ application.properties
-│ │ └─ db/migration # scripts Flyway (opcional)
+│ │ 
 │ └─ test
 │ └─ java … # testes JUnit / MockMvc
 └─ .env # credenciais Oracle (git-ignored)
