@@ -56,6 +56,8 @@ echo DB_PASS=SUASENHA                              >> .env
 
 ## 📚 Principais endpoints
 
+**Teste via Swagger: http://localhost:8080/swagger-ui/index.html**
+
 | Método | Rota                               | Descrição                       | Corpo esperado |
 |--------|------------------------------------|---------------------------------|----------------|
 | GET    | `/api/v1/motos`                    | Lista paginada de motos         | —              |
