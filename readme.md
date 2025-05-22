@@ -54,7 +54,7 @@ echo DB_USER=SEUUSER                               >> .env
 echo DB_PASS=SUASENHA                              >> .env
 ```
 # build & run
-./mvnw clean spring-boot:run
+./mvn -q clean package -DskipTests
 
 ## 📚 Principais endpoints
 
@@ -103,7 +103,7 @@ git clone https://github.com/<sua-org>/autottu.git
 cd autottu
 
 # 2. defina o .env (ou exporte variáveis)
-echo DB_URL=jdbc:oracle:thin:@//localhost:1521/ORCL > .env
+echo DB_URL=jdbc:oracle:thin:@//localhost:1521/ORCL >> .env
 echo DB_USER=AUTOTTU                                >> .env
 echo DB_PASS=Secreta                                >> .env
 

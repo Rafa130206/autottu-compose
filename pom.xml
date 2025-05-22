@@ -133,9 +133,6 @@
 				<!-- ⬇⬇ aplica SÓ ao goal run -->
 				<executions>
 					<execution>
-						<goals>
-							<goal>run</goal>
-						</goals>
 						<configuration>
 							<workingDirectory>${project.basedir}</workingDirectory>
 						</configuration>
