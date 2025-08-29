@@ -1,24 +1,24 @@
-# Autottu – API de gestão de motos 🏍️
-
-API REST construída como parte do **Challenge Autottu (FIAP – 1º semestre / 2025)**.  
-Permite cadastrar, listar, atualizar e remover motos, slots e check-ins, integrando-se a banco **Oracle 19c**.
-
+# Autottu – Conteinerização da API de gestão de motos 🏍️
+ 
+API REST contanerizada como parte do **Chekpoint 1 de DevOps & Cloud Computing (FIAP – 2º semestre / 2025)**.  
+Permite cadastrar, listar, atualizar e remover motos, slots e check-ins, integrando-se a banco **MySQL** a partir de docker compose.
+ 
 ---
-
+ 
 ## 👥 Integrantes
-
+ 
 | Nome | RM |
 |------|----|
 | André Luís Mesquita de Abreu | 558159 |
 | Maria Eduarda Brigidio | 558575 |
 | Rafael Bompadre Lima | 556459 |
-
+ 
 ---
-
+ 
 ## ⚙️ Stack & dependências
-
-> Requer **Java 21** e **Maven 3.9+**
-
+ 
+> Requer **Java 21**, **Maven 3.9+**, **Docker**, **Docker Compose**
+ 
 | Grupo / Artefato | Função | Versão |
 |------------------|--------|--------|
 | **Spring Boot 3.4.5** |
@@ -27,7 +27,7 @@ Permite cadastrar, listar, atualizar e remover motos, slots e check-ins, integra
 | `spring-boot-starter-validation` | Jakarta Bean Validation |
 | `spring-boot-starter-test` | JUnit 5 / MockMvc (*test*) |
 | **Persistência** |
-| `com.oracle.database.jdbc:ojdbc11` | Driver Oracle JDBC | 23.3.0 |
+| `com.mysql:mysql-connector-j` | Driver MySQL JDBC |
 | **DTO / Mapper** |
 | `org.mapstruct:mapstruct` | MapStruct | 1.5.5.Final |
 | `lombok` & `lombok-mapstruct-binding` | Boilerplate + bridge | 1.18.30 / 0.2.0 |
@@ -37,27 +37,29 @@ Permite cadastrar, listar, atualizar e remover motos, slots e check-ins, integra
 | `me.paulschwarz:spring-dotenv` | Variáveis via `.env` | 2.5.4 |
 | **Utilitários** |
 | `org.modelmapper:modelmapper` | Conversões simples | 3.2.2 |
-
+ 
 ---
-
+ 
 ## 🏁 Como executar
-
-
+ 
+ 
 # clone
-git clone https://github.com/<sua-org>/autottu.git
-cd autottu
-
-# configure o banco
 ```bash
-echo DB_URL=jdbc:oracle:thin:@//localhost:1521/ORCL > .env
-echo DB_USER=SEUUSER                               >> .env
-echo DB_PASS=SUASENHA                              >> .env
+git clone https://github.com/Rafa130206/autottu-compose.git
 ```
-
+```bash
+cd autottu-compose
+```
+ 
+# Subir os containers
+```bash
+docker compose up -d --build
+```
+ 
 ## 📚 Principais endpoints
-
-**Teste via Swagger: http://localhost:8080/swagger-ui/index.html**
-
+ 
+**Teste via Swagger: http://<seuip>:8081/swagger-ui/index.html**
+ 
 | Método | Rota                               | Descrição                       | Corpo esperado |
 |--------|------------------------------------|---------------------------------|----------------|
 | GET    | `/api/v1/motos`                    | Lista paginada de motos         | —              |
@@ -68,14 +70,14 @@ echo DB_PASS=SUASENHA                              >> .env
 | GET    | `/api/v1/slots`                    | Lista slots de estacionamento   | —              |
 | POST   | `/api/v1/checkins`                 | Registra check-in da moto       | `CheckinDTO`   |
 | POST   | `/api/v1/auth/login`               | Autentica usuário e gera JWT    | `LoginDTO`     |
-
+ 
 > Todos os endpoints — inclusive erros 400 via `ValidationExceptionHandler` —
 > estão documentados em **/swagger-ui.html**.
-
+ 
 ---
-
+ 
 ## 📂 Estrutura do projeto
-
+ 
 ```bash
 autottu
 ├─ src
@@ -92,28 +94,73 @@ autottu
 │ └─ java … # testes JUnit / MockMvc
 └─ .env # credenciais Oracle (git-ignored)
 ```
-
+ 
 ---
+
+## 🛠️ Possíveis Falhas
+### 1. Pré-Requisitos corretos
+- **Java 21** e **Maven 3.9+**. Se você compilar com JDK 17, verá `release version 21 not supported.`
+**Checagem**
+```bash 
+java -version
+mvn -v               # precisa mostrar Java 21
+```
+Se não estiver em 21:
+```bash 
+sudo dnf install -y java-21-openjdk java-21-openjdk-devel
+sudo alternatives --config java
+sudo alternatives --config javac
+export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+export PATH="$JAVA_HOME/bin:$PATH"
+```
+
+### 2. `mvn clean` falhando para apagar `target/`
+Se aparecer algo como **Failed to clean project: Failed to delete target/classes/application.properties:**
+```bash 
+docker compose down
+sudo lsof +D target || true
+sudo chown -R $USER:$USER .
+sudo rm -rf target
+mvn clean package -DskipTests
+```
+### 3. URL do Swagger vs. Adminer (portas)
+- O Adminer publica 8080, então http://<seuip>:8080 abre o Adminer.
+- A API publica 8081:8080 no Compose, então o Swagger está em:
+```bash 
+http://<seuip>:8081/swagger-ui/index.html
+```
+Se quiser a API no 8080 e Adminer no 8082, altere no docker compose:
+```bash 
+adminer:
+  ports: ["8082:8080"]
+crud-app:
+  ports: ["8080:8080"]
+```
+Depois
+```bash 
+docker compose down
+docker compose up -d --build
+```
+### 4. Adminer não conecta: `“getaddrinfo for db failed”`
+No Compose, o serviço do banco se chama `mysql`, então o Servidor no Adminer deve ser `mysql` (não `db`).
+Campos no Adminer:
+- Sistema: `MySQL`
+- Servidor/host: `mysql`
+- Usuário: `autottu`
+- Senha: `autottu`
+- Base de dados: `autottu`
 
 ## 🏁 Execução rápida
 
 ```bash
 # 1. clone e entre na pasta
-git clone https://github.com/<sua-org>/autottu.git
-cd autottu
-
-# 2. defina o .env (ou exporte variáveis)
-echo DB_URL=jdbc:oracle:thin:@//localhost:1521/ORCL >>>> .env
-echo DB_USER=AUTOTTU                                >> .env
-echo DB_PASS=Secreta                                >> .env
-
-# 3. build & run
-A aplicação está com um bug que não reconhece o arquivo .env ao rodar o comando:
-./mvnw clean spring-boot:run
-
-utilize a inicialização pelo botão de start da sua IDE
+git clone git clone https://github.com/Rafa130206/autottu-compose.git
+cd autottu-compose
+ 
+# 2. build & run
+docker compose up -d --build
 ```
-
+ 
 API: http://localhost:8080
-
+ 
 Swagger: /swagger-ui.html
