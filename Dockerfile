@@ -1,21 +1,25 @@
-FROM maven:3.9.8-eclipse-temurin-21 AS build
+# Stage 1: Build (Maven + Temurin JDK 21)
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
+
 COPY pom.xml .
 RUN mvn -q dependency:go-offline
 
 COPY src ./src
 RUN mvn -q clean package -DskipTests
 
-FROM eclipse-temurin:21-jre
+# Stage 2: Runtime (OpenJDK slim para ficar leve)
+FROM openjdk:21-slim
 WORKDIR /app
 
 COPY --from=build /app/target/*-SNAPSHOT.jar app.jar
 
-ENV DB_HOST=oracle-xe \
-    DB_PORT=1521 \
-    DB_SID=XE \
-    DB_USER=system \
-    DB_PASS=oracle
+ENV DB_HOST=mysql \
+    DB_PORT=3306 \
+    DB_NAME=autottu \
+    DB_USER=root \
+    DB_PASS=root
 
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","app.jar"]
+

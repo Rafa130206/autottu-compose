@@ -1,43 +1,48 @@
-services:
-  # 1) Oracle XE (21c)
-  oracle-xe:
-    image: gvenzl/oracle-xe:21-slim
-    container_name: oracle-xe
-    environment:
-      ORACLE_PASSWORD: Oracle123
-    ports:
-      - "1521:1521"
-      - "5501:5501"
-    volumes:
-      - oracle_data:/opt/oracle/oradata
-      - ./oracle-init:/container-entrypoint-initdb.d
-    networks: [cp2-net]
+version: "3.9"
 
-  # 2) Adminer – interface web opcional
+services:
+  # 1) MySQL oficial
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: autottu
+      MYSQL_USER: autottu
+      MYSQL_PASSWORD: autottu
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks: [app-net]
+
+  # 2) Adminer – interface web para o banco
   adminer:
-    image: dockette/adminer:full
+    image: adminer:latest
     container_name: adminer
     ports:
-      - "8080:80"
-    networks: [cp2-net]
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks: [app-net]
 
   # 3) Sua aplicação CRUD
   crud-app:
     build: .
     container_name: crud-app
-    depends_on: [oracle-xe]
+    depends_on:
+      - mysql
     environment:
-      DB_HOST: oracle-xe
-      DB_PORT: 1521
-      DB_SID: XE
-      DB_USER: system
-      DB_PASS: oracle
+      DB_URL: jdbc:mysql://mysql:3306/autottu
+      DB_USER: autottu
+      DB_PASSWORD: autottu
     ports:
       - "8081:8080"
-    networks: [cp2-net]
+    networks: [app-net]
 
 volumes:
-  oracle_data:
+  mysql_data:
 
 networks:
-  cp2-net:
+  app-net:
+
