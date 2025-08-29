@@ -17,7 +17,7 @@ Permite cadastrar, listar, atualizar e remover motos, slots e check-ins, integra
  
 ## ⚙️ Stack & dependências
  
-> Requer **Java 21**, **Maven 3.9+**, **Docker**, **Docker Compose**
+> Requer **Java 21**, **Maven 3.9+**, **Docker 28.1**, **Docker Compose v2.35.1**
  
 | Grupo / Artefato | Função | Versão |
 |------------------|--------|--------|
