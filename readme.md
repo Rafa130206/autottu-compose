@@ -161,6 +161,6 @@ cd autottu-compose
 docker compose up -d --build
 ```
  
-API: http://localhost:8080
+API: http://<seuip>:8080
  
 Swagger: /swagger-ui.html
