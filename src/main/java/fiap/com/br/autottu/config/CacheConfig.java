@@ -26,7 +26,8 @@ public class CacheConfig {
     public CacheManager cacheManager(Caffeine<Object, Object> caffeine) {
         SimpleCacheManager manager = new SimpleCacheManager();
         manager.setCaches(List.of(
-                new CaffeineCache("moto", caffeine.build())
+                new CaffeineCache("moto", caffeine.build()),
+		new CaffeineCache("motos", caffeine.build())
         ));
         return manager;
     }
