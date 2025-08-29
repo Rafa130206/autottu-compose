@@ -67,9 +67,6 @@ docker compose up -d --build
 | POST   | `/api/v1/motos`                    | Cria nova moto                  | `MotoDTO`      |
 | PUT    | `/api/v1/motos/{id}`               | Atualiza dados da moto          | `MotoDTO` (parcial ou completo) |
 | DELETE | `/api/v1/motos/{id}`               | Remove moto                     | —              |
-| GET    | `/api/v1/slots`                    | Lista slots de estacionamento   | —              |
-| POST   | `/api/v1/checkins`                 | Registra check-in da moto       | `CheckinDTO`   |
-| POST   | `/api/v1/auth/login`               | Autentica usuário e gera JWT    | `LoginDTO`     |
  
 > Todos os endpoints — inclusive erros 400 via `ValidationExceptionHandler` —
 > estão documentados em **/swagger-ui.html**.
@@ -124,7 +121,7 @@ sudo rm -rf target
 mvn clean package -DskipTests
 ```
 ### 3. URL do Swagger vs. Adminer (portas)
-- O Adminer publica 8080, então http://<seuip>:8080 abre o Adminer.
+- O Adminer publica 8080, então http://<seuip>:8080/swagger-ui/index.html# abre o Adminer.
 - A API publica 8081:8080 no Compose, então o Swagger está em:
 ```bash 
 http://<seuip>:8081/swagger-ui/index.html
@@ -161,6 +158,6 @@ cd autottu-compose
 docker compose up -d --build
 ```
  
-API: http://<seuip>:8080
+API: http://<seuip>:8080/swagger-ui/index.html#
  
-Swagger: /swagger-ui.html
+Swagger: http://<seuip>:8081/swagger-ui/index.html#
